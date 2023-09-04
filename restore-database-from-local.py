@@ -38,6 +38,9 @@ if __name__ == '__main__':
     print(client.list_database_names())
     print(database_name)
 
-    os.system(f'cmd /k mongorestore --drop {uri} --db dev-invoice-generator --gzip --archive=dump_2023-09-03_23-21-26.gz')
+   # os.system(f'cmd /k mongorestore --drop --uri={uri} --gzip --nsInclude="*"  --archive=dump\dump_2023-09-04_10-03-13.gz -v')
+
+    # LINE BELOW WORKS
+    os.system(f'cmd /k mongorestore --drop --uri={uri} --nsInclude="*"  --verbose')
     print("Restore completed!")
     exit()
