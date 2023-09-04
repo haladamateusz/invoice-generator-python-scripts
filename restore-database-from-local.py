@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-import pymongo
 import sys
 
 load_dotenv()
@@ -14,7 +13,6 @@ env_map = {
 # run this script with the environment as the first argument e.g. python restore-database-from-local.py local/dev/prod
 if __name__ == '__main__':
     environment = sys.argv[1]
-    print(environment)
     print("Starting restore operation...")
     username = os.getenv(f'{env_map[environment]}_DB_USER')
     password = os.getenv(f'{env_map[environment]}_DB_PASSWORD')
@@ -22,25 +20,16 @@ if __name__ == '__main__':
     database_url = os.getenv(f'{env_map[environment]}_DB_URL')
     output_path = os.getenv('OUTPUT_PATH')
     uri = None
-    client = None
 
     if 'local' == environment:
-        #client = pymongo.MongoClient(f"mongodb://{username}:{password}@{database_url}/")
         uri = f"mongodb://{username}:{password}@{database_url}/"
     if 'dev' == environment or 'prod' == environment:
         uri = f"mongodb+srv://{username}:{password}@{database_url}/?retryWrites=true&w=majority"
-        client = pymongo.MongoClient(f'mongodb+srv://{username}:{password}@{database_url}/')
-    #if database_name in client.list_database_names():
-    #    print(f'Dropping existing database {database_name}...')
-    #    client.drop_database(database_name)
-    # --authenticationDatabase admin
 
-    print(client.list_database_names())
-    print(database_name)
+    os.system(f'cmd /c mongorestore --verbose --drop --uri="{uri}" --nsFrom="invoice-generator.*" --nsTo="{database_name}.*" --gzip --archive="dump/dump_2023-09-04_11-12-32.gz"')
 
-   # os.system(f'cmd /k mongorestore --drop --uri={uri} --gzip --nsInclude="*"  --archive=dump\dump_2023-09-04_10-03-13.gz -v')
-
-    # LINE BELOW WORKS
-    os.system(f'cmd /k mongorestore --drop --uri={uri} --nsInclude="*"  --verbose')
     print("Restore completed!")
-    exit()
+
+# cool one liner for later usage
+# mongodump --archive --gzip --db=someDistantDB |
+# mongorestore --archive --gzip  --nsFrom='someLocalDB.*' --nsTo='someLocalDB.*'

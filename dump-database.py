@@ -16,8 +16,8 @@ if __name__ == '__main__':
 
     if 'gzip' == dump_type:
         time_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        os.system(f'cmd /k mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin --gzip --archive > dump/dump_{time_now}.gz')
+        os.system(f'cmd /c mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin --gzip --archive > dump/dump_{time_now}.gz')
     if 'bson' == dump_type:
-        os.system(f'cmd /k mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin')
+        os.system(f'cmd /c mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin')
     print("Backup completed!")
     exit()
