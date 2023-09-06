@@ -2,22 +2,23 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import sys
+from env_map import get_env_data
 
 load_dotenv()
 
 if __name__ == '__main__':
-    dump_type = sys.argv[1] # gzip or bson
+    environment = sys.argv[1]  # prod, dev or local
     print("Starting backup...")
-    username = os.getenv('LOCAL_DB_USER')
-    password = os.getenv('LOCAL_DB_PASSWORD')
-    database_name = os.getenv('LOCAL_DB_NAME')
-    database_url = os.getenv("LOCAL_DB_URL")
-    output_path = os.getenv('OUTPUT_PATH')
+    env_data = get_env_data(environment)
 
-    if 'gzip' == dump_type:
-        time_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        os.system(f'cmd /c mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin --gzip --archive > dump/dump_{time_now}.gz')
-    if 'bson' == dump_type:
-        os.system(f'cmd /c mongodump mongodb://{username}:{password}@{database_url}/{database_name} --authenticationDatabase admin')
+    # if 'gzip' == dump_type:
+    time_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    if 'local' == environment:
+        os.system(f'cmd /c mongodump mongodb://{env_data["username"]}:{env_data["password"]}@{env_data["database_url"]}/{env_data["database_name"]} --authenticationDatabase=admin --gzip --archive=dump_{time_now}.gz')
+    if 'dev' == environment or 'prod' == environment:
+        os.system(f'cmd /c mongodump mongodb+srv://{env_data["username"]}:{env_data["password"]}@{env_data["database_url"]}/{env_data["database_name"]} --authenticationDatabase=admin --gzip --archive=dump_{time_now}.gz')
+    # if 'bson' == dump_type:
+    # os.system(f' cmd /c mongodump mongodb://{username}:{password}@{database_url}/{database_name}
+    # --authenticationDatabase admin')
     print("Backup completed!")
     exit()
